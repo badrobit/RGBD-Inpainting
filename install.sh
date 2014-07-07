@@ -3,7 +3,7 @@ mkdir build
 cd build
 scriptpath="PWD"
 echo "Installing any required compilation tools" 
-sudo apt-get -qq install cmake cmake-curses-gui
+sudo apt-get -qq install cmake cmake-curses-gui g++
 opencvthere=$(pkg-config --libs opencv | grep \".*libopencv.*\")
 if [ -z $opencvthere ]
 then
@@ -20,7 +20,7 @@ else
 fi
 
 echo "Running CMake ..."
-cmake -F CMAKE_BUILD_TYPE=DEBUG ..
+cmake ..
 make -j4
 clear
 echo "RGB-D Inpainting Compiled and Installed"
