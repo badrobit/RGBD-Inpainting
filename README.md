@@ -33,6 +33,7 @@ Everything you need to compile and install the source code is provided in instal
 
 ```
 chmod a+x install.sh
+sh install.sh
 ```
 
 ## Running the program
