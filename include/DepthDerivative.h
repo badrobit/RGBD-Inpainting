@@ -6,22 +6,24 @@
  */
 
 // ITK Includes
-#include <itkImage.h>
+#include <itkComposeImageFilter.h>
 #include <itkDerivativeImageFilter.h>
 #include <itkForwardDifferenceOperator.h>
-#include "itkNeighborhoodOperatorImageFilter.h"
+#include <itkNeighborhoodOperatorImageFilter.h>
+
+// Google Logging
+#include <glog/logging.h>
+
+// Project Helpers
+#include <Helpers.hpp>
 
 #ifndef DEPTHDERIVATIVE_H_
 #define DEPTHDERIVATIVE_H_
 
+using namespace google;
+
 namespace RGBDInpainting
 {
-
-typedef itk::Image<unsigned char, 2> ScalarImage;
-typedef ScalarImage::Pointer ScalarImagePointer;
-
-typedef itk::Image<itk::CovariantVector<float, 2>, 2> GradientImage;
-typedef GradientImage::Pointer GradientImagePointer;
 
 class DepthDerivative
 {
@@ -30,13 +32,20 @@ public:
 
 	virtual ~DepthDerivative();
 
-	void SetInputDepthMap( ScalarImagePointer input_depth_map );
+	void SetInputDepthMap( ScalarImage* input_depth_map );
+
+    void Update();
+
+    GradientImagePointer GetOutput();
+
+    void ForwardDifferenceDerivative( const ScalarImage::Pointer input_depth_map, GradientImage* const gradient_image );
 
 private:
-	void ForwardDifferenceDerivative( const GradientImagePointer gradient_image );
+
 
 protected:
 	ScalarImagePointer original_depth_map;
+    GradientImagePointer m_gradient_image;
 };
 
 }

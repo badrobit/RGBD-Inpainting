@@ -1,0 +1,3 @@
+[submodule "ThirdParty/GoogleLogging"]
+	path = ThirdParty/GoogleLogging
+	url = https://github.com/Bad-Robot/GoogleLogging
