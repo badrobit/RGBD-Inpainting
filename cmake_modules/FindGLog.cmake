@@ -79,7 +79,7 @@ else(MSVC)
 _FIND_GLOG_LIBRARY(GLOG_LIBRARY libglog.so)
 endif(MSVC)
 
-message("glog library = " ${GLOG_LIBRARY})
+#message("glog library = " ${GLOG_LIBRARY})
 
 # handle the QUIETLY and REQUIRED arguments and set GLOG_FOUND to TRUE if
 # all listed variables are TRUE

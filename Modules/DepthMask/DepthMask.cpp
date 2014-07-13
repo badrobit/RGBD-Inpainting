@@ -16,18 +16,6 @@
  *
  *=========================================================================*/
 #include <DepthMask/DepthMask.h>
-#include <Helpers/Helpers.hpp>
-
-// ITK
-#include "itkBinaryContourImageFilter.h"
-#include "itkBinaryDilateImageFilter.h"
-#include "itkBinaryErodeImageFilter.h"
-#include "itkConnectedComponentImageFilter.h"
-#include "itkFlatStructuringElement.h"
-#include "itkInvertIntensityImageFilter.h"
-#include "itkImageRegionIterator.h"
-#include "itkLabelShapeKeepNObjectsImageFilter.h"
-#include "itkRescaleIntensityImageFilter.h"
 
 std::string Mask::GetFilenameFromMaskFile(const std::string& maskFileName)
 {
@@ -48,7 +36,7 @@ std::string Mask::GetFilenameFromMaskFile(const std::string& maskFileName)
    * That is, the "valid VALUE" line can be either on the first or second line.
    * Note that the 0 and 255 here are arbitrary and can be anything.
    */
-  std::string extension = Helpers::GetFileExtension(maskFileName);
+  std::string extension = GetFileExtension(maskFileName);
   if(extension != "mask")
   {
     std::stringstream ss;
@@ -95,7 +83,7 @@ void Mask::Read(const std::string& filename)
    * That is, the "valid VALUE" line can be either on the first or second line.
    * Note that the 0 and 255 here are arbitrary and can be anything.
    */
-  std::string extension = Helpers::GetFileExtension(filename);
+  std::string extension = GetFileExtension(filename);
   if(extension != "mask")
   {
     std::stringstream ss;
@@ -168,7 +156,7 @@ void Mask::Read(const std::string& filename)
   getline(fin, imageFileName);
   std::cout << "Mask image file: " << imageFileName << std::endl;
 
-  std::string path = Helpers::GetPath(filename);
+  std::string path = GetPath(filename);
 
   std::string fullImageFileName = path + imageFileName;
 
@@ -201,7 +189,7 @@ std::vector<itk::Index<2> > Mask::FindBoundaryPixelsInRegion(const itk::ImageReg
   {
     if(maskIterator.Get() == whichSideOfBoundary)
     {
-      if(ITKHelpers::HasNeighborWithValueOtherThan(maskIterator.GetIndex(), this,
+      if(HasNeighborWithValueOtherThan(maskIterator.GetIndex(), this,
                                                    whichSideOfBoundary))
       {
         boundaryPixels.push_back(maskIterator.GetIndex());
@@ -284,10 +272,10 @@ std::vector<itk::Offset<2> > Mask::GetValidOffsetsInRegion(itk::ImageRegion<2> r
   region.Crop(this->GetLargestPossibleRegion());
 
   std::vector<itk::Index<2> > indices =
-      ITKHelpers::GetPixelsWithValueInRegion(this, region, HoleMaskPixelTypeEnum::VALID);
+      GetPixelsWithValueInRegion(this, region, HoleMaskPixelTypeEnum::VALID);
 
   std::vector<itk::Offset<2> > validOffsets =
-      ITKHelpers::IndicesToOffsets(indices, region.GetIndex());
+      IndicesToOffsets(indices, region.GetIndex());
 
   return validOffsets;
 }
@@ -298,10 +286,10 @@ std::vector<itk::Offset<2> > Mask::GetHoleOffsetsInRegion(itk::ImageRegion<2> re
   region.Crop(this->GetLargestPossibleRegion());
 
   std::vector<itk::Index<2> > indices =
-      ITKHelpers::GetPixelsWithValueInRegion(this, region, HoleMaskPixelTypeEnum::HOLE);
+      GetPixelsWithValueInRegion(this, region, HoleMaskPixelTypeEnum::HOLE);
 
   std::vector<itk::Offset<2> > holeOffsets =
-      ITKHelpers::IndicesToOffsets(indices, region.GetIndex());
+      IndicesToOffsets(indices, region.GetIndex());
 
   return holeOffsets;
 }
@@ -318,7 +306,7 @@ std::vector<itk::Index<2> > Mask::GetValidPixelsInRegion(itk::ImageRegion<2> reg
   region.Crop(this->GetLargestPossibleRegion());
 
   std::vector<itk::Index<2> > validPixels =
-      ITKHelpers::GetPixelsWithValueInRegion(this, region, HoleMaskPixelTypeEnum::VALID);
+      GetPixelsWithValueInRegion(this, region, HoleMaskPixelTypeEnum::VALID);
 
   if(!forward)
   {
@@ -334,7 +322,7 @@ std::vector<itk::Index<2> > Mask::GetHolePixelsInRegion(itk::ImageRegion<2> regi
   region.Crop(this->GetLargestPossibleRegion());
 
   std::vector<itk::Index<2> > holePixels =
-      ITKHelpers::GetPixelsWithValueInRegion(this, region, HoleMaskPixelTypeEnum::HOLE);
+      GetPixelsWithValueInRegion(this, region, HoleMaskPixelTypeEnum::HOLE);
 
   return holePixels;
 }
@@ -350,13 +338,13 @@ bool Mask::IsHole(const itk::Index<2>& index) const
 
 bool Mask::IsHole(const itk::ImageRegion<2>& region) const
 {
-  return ITKHelpers::AllPixelsEqualTo(this, region,
+  return AllPixelsEqualTo(this, region,
                                       HoleMaskPixelTypeEnum::HOLE);
 }
 
 bool Mask::IsValid(const itk::ImageRegion<2>& region) const
 {
-  return ITKHelpers::AllPixelsEqualTo(this, region,
+  return AllPixelsEqualTo(this, region,
                                       HoleMaskPixelTypeEnum::VALID);
 }
 
@@ -547,13 +535,13 @@ void Mask::CreateBoundaryImageInRegion(const itk::ImageRegion<2>& region, Bounda
   UnsignedCharImageType::Pointer binaryImage = UnsignedCharImageType::New();
   binaryImage->SetRegions(region);
   binaryImage->Allocate();
-  ITKHelpers::CopyRegion(fullBinaryImage.GetPointer(), binaryImage.GetPointer(), region, region);
+  CopyRegion(fullBinaryImage.GetPointer(), binaryImage.GetPointer(), region, region);
 
   // Extract the relevant region from the mask
   Mask::Pointer extractedRegionMask = Mask::New();
   extractedRegionMask->SetRegions(region);
   extractedRegionMask->Allocate();
-  ITKHelpers::CopyRegion(this, extractedRegionMask.GetPointer(), region, region);
+  CopyRegion(this, extractedRegionMask.GetPointer(), region, region);
 
   // Since the hole is white (we have specified this at the beginning of this function),
   // we want the foreground value of the contour filter to be black.
@@ -588,7 +576,7 @@ void Mask::CreateBoundaryImageInRegion(const itk::ImageRegion<2>& region, Bounda
 
   binaryContourFilter->Update();
 
-  ITKHelpers::DeepCopy(binaryContourFilter->GetOutput(), boundaryImage);
+  DeepCopy(binaryContourFilter->GetOutput(), boundaryImage);
 }
 
 void Mask::CreateBoundaryImage(itk::Image<unsigned char, 2>* const boundaryImage,
@@ -601,12 +589,12 @@ void Mask::CreateBoundaryImage(itk::Image<unsigned char, 2>* const boundaryImage
 /** Get a list of the valid neighbors of a pixel.*/
 std::vector<itk::Index<2> > Mask::GetValid8Neighbors(const itk::Index<2>& pixel) const
 {
-  return ITKHelpers::Get8NeighborsWithValue(pixel, this, HoleMaskPixelTypeEnum::VALID);
+  return Get8NeighborsWithValue(pixel, this, HoleMaskPixelTypeEnum::VALID);
 }
 
 std::vector<itk::Index<2> > Mask::GetValid8NeighborsInRegion(const itk::Index<2>& pixel, const itk::ImageRegion<2>& region) const
 {
-  return ITKHelpers::Get8NeighborsInRegionWithValue(pixel, this, region,
+  return Get8NeighborsInRegionWithValue(pixel, this, region,
                                                     HoleMaskPixelTypeEnum::VALID);
 }
 
@@ -632,31 +620,31 @@ bool Mask::HasValid8Neighbor(const itk::Index<2>& pixel) const
 /** Get a list of the hole neighbors of a pixel.*/
 std::vector<itk::Index<2> > Mask::GetHole8Neighbors(const itk::Index<2>& pixel) const
 {
-  return ITKHelpers::Get8NeighborsWithValue(pixel, this, HoleMaskPixelTypeEnum::HOLE);
+  return Get8NeighborsWithValue(pixel, this, HoleMaskPixelTypeEnum::HOLE);
 }
 
 std::vector<itk::Index<2> > Mask::GetHole8NeighborsInRegion(const itk::Index<2>& pixel,
                                                             const itk::ImageRegion<2>& region) const
 {
-  return ITKHelpers::Get8NeighborsInRegionWithValue(pixel, this, region,
+  return Get8NeighborsInRegionWithValue(pixel, this, region,
                                                     HoleMaskPixelTypeEnum::HOLE);
 }
 
 std::vector<itk::Offset<2> > Mask::GetValid8NeighborOffsets(const itk::Index<2>& pixel) const
 {
   std::vector<itk::Index<2> > indices =
-      ITKHelpers::Get8NeighborsWithValue(pixel, this, HoleMaskPixelTypeEnum::VALID);
+      Get8NeighborsWithValue(pixel, this, HoleMaskPixelTypeEnum::VALID);
 
-  std::vector<itk::Offset<2> > offsets = ITKHelpers::IndicesToOffsets(indices, pixel);
+  std::vector<itk::Offset<2> > offsets = IndicesToOffsets(indices, pixel);
   return offsets;
 }
 
 std::vector<itk::Offset<2> > Mask::GetHole8NeighborOffsets(const itk::Index<2>& pixel) const
 {
   std::vector<itk::Index<2> > indices =
-      ITKHelpers::Get8NeighborsWithValue(pixel, this, HoleMaskPixelTypeEnum::HOLE);
+      Get8NeighborsWithValue(pixel, this, HoleMaskPixelTypeEnum::HOLE);
 
-  std::vector<itk::Offset<2> > offsets = ITKHelpers::IndicesToOffsets(indices, pixel);
+  std::vector<itk::Offset<2> > offsets = IndicesToOffsets(indices, pixel);
 
   return offsets;
 }
@@ -673,12 +661,12 @@ void Mask::MarkAsValid(const itk::Index<2>& pixel)
 
 bool Mask::HasValid4Neighbor(const itk::Index<2>& pixel)
 {
-  return ITKHelpers::Has4NeighborsWithValue(this, pixel, HoleMaskPixelTypeEnum::VALID);
+  return Has4NeighborsWithValue(this, pixel, HoleMaskPixelTypeEnum::VALID);
 }
 
 std::vector<itk::Index<2> > Mask::GetValid4Neighbors(const itk::Index<2>& pixel)
 {
-  return ITKHelpers::Get4NeighborsWithValue(this, pixel, HoleMaskPixelTypeEnum::VALID);
+  return Get4NeighborsWithValue(this, pixel, HoleMaskPixelTypeEnum::VALID);
 }
 
 void Mask::KeepLargestHole()
@@ -694,7 +682,7 @@ void Mask::KeepLargestHole()
   connectedComponentFilter->SetInput(this);
   connectedComponentFilter->Update();
 
-  ITKHelpers::WriteImage(connectedComponentFilter->GetOutput(), "ConnectedComponents.mha");
+  WriteImage(connectedComponentFilter->GetOutput(), "ConnectedComponents.mha");
 
   typedef itk::LabelShapeKeepNObjectsImageFilter<LabelImageType>
       LabelShapeKeepNObjectsImageFilterType;
@@ -707,12 +695,12 @@ void Mask::KeepLargestHole()
             ->SetAttribute(LabelShapeKeepNObjectsImageFilterType::LabelObjectType::NUMBER_OF_PIXELS);
   labelShapeKeepNObjectsImageFilter->Update();
 
-  ITKHelpers::WriteImage(labelShapeKeepNObjectsImageFilter->GetOutput(),
+  WriteImage(labelShapeKeepNObjectsImageFilter->GetOutput(),
                          "LargestComponent.mha");
 
   // TODO: replace whatever value is the foreground (by looking at the output above)
   // with HOLE
-//  ITKHelpers::DeepCopy(rescaleFilter->GetOutput(), this);
+//  DeepCopy(rescaleFilter->GetOutput(), this);
 }
 
 unsigned int Mask::CountValidPatches(const unsigned int patchRadius) const
@@ -725,7 +713,7 @@ unsigned int Mask::CountValidPatches(const unsigned int patchRadius) const
   while(!maskIterator.IsAtEnd())
   {
     itk::ImageRegion<2> region =
-        ITKHelpers::GetRegionInRadiusAroundPixel(maskIterator.GetIndex(), patchRadius);
+        GetRegionInRadiusAroundPixel(maskIterator.GetIndex(), patchRadius);
 
     if(this->IsValid(region))
     {
@@ -746,7 +734,7 @@ itk::ImageRegion<2> Mask::FindFirstValidPatch(const unsigned int patchRadius)
   while(!maskIterator.IsAtEnd())
   {
     itk::ImageRegion<2> region =
-        ITKHelpers::GetRegionInRadiusAroundPixel(maskIterator.GetIndex(), patchRadius);
+        GetRegionInRadiusAroundPixel(maskIterator.GetIndex(), patchRadius);
 
     if(this->IsValid(region))
     {
@@ -771,7 +759,7 @@ void Mask::SetValid(const itk::Index<2>& index)
 
 void Mask::SetValid(const itk::ImageRegion<2>& region)
 {
-  ITKHelpers::SetRegionToConstant(this, region, HoleMaskPixelTypeEnum::VALID);
+  SetRegionToConstant(this, region, HoleMaskPixelTypeEnum::VALID);
 }
 
 std::ostream& operator<<(std::ostream& output, const HoleMaskPixelTypeEnum &pixelType)

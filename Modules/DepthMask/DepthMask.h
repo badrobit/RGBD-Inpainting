@@ -26,12 +26,23 @@
        the reader sometimes produces a blank image. We throw an exception if this is the case.
        Your mask should be a 1 or 3 channel image.
 */
+#include <Helpers/Helpers.hpp>
+
+// ITK
+#include "itkBinaryContourImageFilter.h"
+#include "itkBinaryDilateImageFilter.h"
+#include "itkBinaryErodeImageFilter.h"
+#include "itkConnectedComponentImageFilter.h"
+#include "itkFlatStructuringElement.h"
+#include "itkInvertIntensityImageFilter.h"
+#include "itkImageRegionIterator.h"
+#include "itkLabelShapeKeepNObjectsImageFilter.h"
+#include "itkRescaleIntensityImageFilter.h"
 
 #ifndef DepthMask_H
 #define DepthMask_H
 
-// ITK
-#include "itkImage.h"
+using namespace RGBDInpainting;
 
 /** The pixels in the mask have only these possible values. */
 enum class HoleMaskPixelTypeEnum {HOLE, VALID, UNDETERMINED};

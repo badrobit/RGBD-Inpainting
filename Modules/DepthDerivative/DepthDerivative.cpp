@@ -5,7 +5,7 @@
  *      Author: badrobit
  */
 
-#include "DepthDerivative.h"
+#include "DepthDerivative/DepthDerivative.h"
 
 namespace RGBDInpainting
 {
@@ -79,7 +79,7 @@ DepthDerivative::ForwardDifferenceDerivative( const ScalarImage::Pointer input_d
 
 #ifndef NDEBUG
 	DLOG(INFO) << "Saving X Derivative to File";
-	SaveImage( DerivativeXFilter->GetOutput(), "xDerivative.png" );
+	Helpers::SaveImage( DerivativeXFilter->GetOutput(), "xDerivative.png" );
 #endif
 
 // 	DLOG(INFO) << "computing Y derivative";

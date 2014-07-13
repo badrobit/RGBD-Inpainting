@@ -4,6 +4,8 @@
  *  Created on: Jul 8, 2014
  *      Author: badrobit
  */
+#ifndef DEPTHDERIVATIVE_H_
+#define DEPTHDERIVATIVE_H_
 
 // ITK Includes
 #include <itkComposeImageFilter.h>
@@ -16,10 +18,6 @@
 
 // Project Helpers
 #include <Helpers/Helpers.hpp>
-#include <Helpers/ITKImageTypes.h>
-
-#ifndef DEPTHDERIVATIVE_H_
-#define DEPTHDERIVATIVE_H_
 
 using namespace google;
 

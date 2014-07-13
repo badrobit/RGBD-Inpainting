@@ -1,5 +1,4 @@
-#include <DepthDerivative.h>
-#include <Helpers.hpp>
+#include "DepthDerivative/DepthDerivative.h"
 
 using namespace RGBDInpainting;
 

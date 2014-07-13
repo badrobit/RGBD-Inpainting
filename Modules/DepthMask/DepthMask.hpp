@@ -210,8 +210,7 @@ void Mask::ReadFromImage(const std::string& filename,
   std::cout << "Reading mask from image: " << filename << std::endl;
 
   // Ensure the input image can be interpreted as a mask.
-  unsigned int numberOfComponents =
-      ITKHelpers::GetNumberOfComponentsPerPixelInFile(filename);
+  unsigned int numberOfComponents = GetNumberOfComponentsPerPixelInFile( filename );
 
   if(!(numberOfComponents == 1 || numberOfComponents == 3))
   {
