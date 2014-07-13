@@ -1,10 +1,14 @@
+// SubModules
+#include <Helpers/ITKImageTypes.h>
+
+// Google Logging
+#include <glog/logging.h>
+
 // ITK Includes
 #include <itkImage.h>
 #include <itkImageFileWriter.h>
 #include <itkImageFileReader.h>
 
-// Google Logging
-#include <glog/logging.h>
 
 #ifndef HELPERS_HPP_
 #define HELPERS_HPP_
@@ -13,13 +17,6 @@ using namespace google;
 
 namespace RGBDInpainting
 {
-typedef itk::Image<itk::RGBPixel<unsigned char>, 2> RGBImage;
-
-typedef itk::Image<unsigned char, 2> ScalarImage;
-typedef ScalarImage::Pointer ScalarImagePointer;
-
-typedef itk::Image<itk::CovariantVector<float, 2>, 2> GradientImage;
-typedef GradientImage::Pointer GradientImagePointer;
 
 template< typename InputImageType, typename OutputImageType >
 void DeepCopyImageRegions( const InputImageType* input_image, const itk::ImageRegion<2>& image_region, OutputImageType* output_image )

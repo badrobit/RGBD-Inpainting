@@ -15,7 +15,8 @@
 #include <glog/logging.h>
 
 // Project Helpers
-#include <Helpers.hpp>
+#include <Helpers/Helpers.hpp>
+#include <Helpers/ITKImageTypes.h>
 
 #ifndef DEPTHDERIVATIVE_H_
 #define DEPTHDERIVATIVE_H_
